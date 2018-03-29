@@ -50,7 +50,8 @@ cordova plugin add cordova-plugin-openwith-ios \
 
 | variable | example | notes |
 |---|---|---|
-| `IOS_URL_SCHEME` | uniquelonglowercase | **iOS only** Any random long string of lowercase alphabetical characters |
+| `IOS_URL_SCHEME` | uniquelonglowercase | Any random long string of lowercase alphabetical characters |
+| `DISPLAY_NAME` | My App Name | If you want to use a different name than your project name |
 
 It shouldn't be too hard. But just in case, Jean-Christophe Hoelt [posted a screencast of it](https://youtu.be/eaE4m_xO1mg).
 
