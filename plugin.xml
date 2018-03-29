@@ -60,11 +60,12 @@ SOFTWARE.
 
         <source-file src="src/ios/OpenWithPlugin.m" />
 
+        <!-- Info.plist -->
         <config-file target="*-Info.plist" parent="CFBundleURLTypes">
             <array>
                 <dict>
                     <string>CFBundleURLName</string>
-                    <string>cc.fovea.openwith.$IOS_URL_SCHEME.shareextension</string>
+                    <string>$(CFBundleIdentifier).shareextension</string>
                     <string>CFBundleURLSchemes</string>
                     <array>
                         <string>$IOS_URL_SCHEME</string>
@@ -73,11 +74,27 @@ SOFTWARE.
             </array>
         </config-file>
 
+        <!-- Entitlements (Debug) -->
+        <config-file target="*-Debug.plist" parent="com.apple.security.application-groups">
+          <array>
+            <string>group.$(CFBundleIdentifier).shareextension</string>
+          </array>
+        </config-file>
+
+        <!-- Entitlements (Release) -->
+        <config-file target="*-Release.plist" parent="com.apple.security.application-groups">
+          <array>
+            <string>group.$(CFBundleIdentifier).shareextension</string>
+          </array>
+        </config-file>
+
+        <!-- Cordova hooks -->
         <hook type="before_plugin_install" src="hooks/npmInstall.js" />
         <hook type="before_plugin_install" src="hooks/iosCopyShareExtension.js" />
         <hook type="after_plugin_install" src="hooks/iosAddTarget.js" />
         <hook type="before_plugin_uninstall" src="hooks/iosRemoveTarget.js" />
 
+        <!-- Dependencies -->
         <framework src="MobileCoreServices.framework" />
     </platform>
 <!--
