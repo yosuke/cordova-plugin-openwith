@@ -97,4 +97,37 @@ SOFTWARE.
     <!-- Dependencies -->
     <framework src="MobileCoreServices.framework" />
   </platform>
+
+  <!-- android -->
+  <platform name="android">
+    <preference name="ANDROID_MIME_TYPE" />
+
+    <js-module src="www/openwith.js" name="openwith">
+      <clobbers target="cordova.openwith" />
+    </js-module>
+
+    <config-file target="AndroidManifest.xml" parent="/manifest/application/activity">
+      <intent-filter>
+        <!-- See https://developer.android.com/guide/topics/manifest/data-element.html -->
+        <data android:mimeType="$ANDROID_MIME_TYPE" />
+        <action android:name="android.intent.action.SEND" />
+        <action android:name="android.intent.action.SEND_MULTIPLE" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+      </intent-filter>
+    </config-file>
+
+    <!-- Cordova >= 3.0.0 -->
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="OpenWithPlugin">
+        <param name="android-package" value="com.missiveapp.openwith.OpenWithPlugin"/>
+      </feature>
+    </config-file>
+
+    <!-- cordova plugin src files -->
+    <source-file src="src/android/com/missiveapp/openwith/OpenWithPlugin.java" target-dir="src/com/missiveapp/openwith" />
+    <source-file src="src/android/com/missiveapp/openwith/PluginResultSender.java" target-dir="src/com/missiveapp/openwith" />
+    <source-file src="src/android/com/missiveapp/openwith/Serializer.java" target-dir="src/com/missiveapp/openwith" />
+    <source-file src="src/android/com/missiveapp/openwith/ByteStreams.java" target-dir="src/com/missiveapp/openwith" />
+  </platform>
 </plugin>

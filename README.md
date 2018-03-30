@@ -50,6 +50,7 @@ cordova plugin add cordova-plugin-openwith \
 
 | variable | example | notes |
 |---|---|---|
+| `ANDROID_MIME_TYPE` | image/* | Mime type of documents you want to share (wildcards accepted) |
 | `IOS_URL_SCHEME` | uniquelonglowercase | Any random long string of lowercase alphabetical characters |
 | `DISPLAY_NAME` | My App Name | If you want to use a different name than your project name |
 | `PROVISIONING_PROFILE` | a71204b0-8187-4dcb-a343-1d43bd543c76 | The provisioning profile ID of your share extension App ID |

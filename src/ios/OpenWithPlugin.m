@@ -220,4 +220,3 @@ static NSDictionary* launchOptions = nil;
 
 
 @end
-// vim: ts=4:sw=4:et
