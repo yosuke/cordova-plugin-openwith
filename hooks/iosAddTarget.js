@@ -29,7 +29,7 @@
 // THE SOFTWARE.
 //
 
-const PLUGIN_ID = 'cordova-plugin-openwith-ios';
+const PLUGIN_ID = 'cordova-plugin-openwith';
 const BUNDLE_SUFFIX = '.shareextension';
 
 var fs = require('fs');
