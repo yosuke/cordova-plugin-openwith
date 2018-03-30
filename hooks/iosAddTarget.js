@@ -105,13 +105,6 @@ function getCordovaParameter(configXml, variableName) {
   return variable;
 }
 
-// Get the bundle id from config.xml
-// function getBundleId(context, configXml) {
-//   var elementTree = context.requireCordovaModule('elementtree');
-//   var etree = elementTree.parse(configXml);
-//   return etree.getroot().get('id');
-// }
-
 function parsePbxProject(context, pbxProjectPath) {
   var xcode = context.requireCordovaModule('xcode');
   console.log('    Parsing existing project at location: ' + pbxProjectPath + '...');
@@ -170,9 +163,15 @@ function getPreferences(context, configXml, projectName) {
 }
 
 // Return the list of files in the share extension project, organized by type
+var FILE_TYPES = {
+  '.h':'source',
+  '.m':'source',
+  '.plist':'config',
+  '.entitlements':'config',
+};
+
 function getShareExtensionFiles(context) {
-  var files = {source:[],plist:[],resource:[]};
-  var FILE_TYPES = { '.h':'source', '.m':'source', '.plist':'plist' };
+  var files = { source: [], config: [], resource: [] };
   forEachShareExtensionFile(context, function(file) {
     var fileType = FILE_TYPES[file.extension] || 'resource';
     files[fileType].push(file);
@@ -187,8 +186,8 @@ function printShareExtensionFiles(files) {
     console.log('     - ', file.name);
   });
 
-  console.log('    Plist files:');
-  files.plist.forEach(function(file) {
+  console.log('    Config files:');
+  files.config.forEach(function(file) {
     console.log('     - ', file.name);
   });
 
@@ -205,9 +204,9 @@ module.exports = function (context) {
   var Q = context.requireCordovaModule('q');
   var deferral = new Q.defer();
 
-  // if (context.opts.cordova.platforms.indexOf('ios') < 0) {
-  //   log('You have to add the ios platform before adding this plugin!', 'error');
-  // }
+  if (context.opts.cordova.platforms.indexOf('ios') < 0) {
+    log('You have to add the ios platform before adding this plugin!', 'error');
+  }
 
   var configXml = fs.readFileSync(path.join(context.opts.projectRoot, 'config.xml'), 'utf-8');
   if (configXml) {
@@ -225,7 +224,7 @@ module.exports = function (context) {
     // printShareExtensionFiles(files);
 
     var preferences = getPreferences(context, configXml, projectName);
-    files.plist.concat(files.source).forEach(function(file) {
+    files.config.concat(files.source).forEach(function(file) {
       replacePreferencesInFile(file.path, preferences);
       // console.log('    Successfully updated ' + file.name);
     });
@@ -263,7 +262,7 @@ module.exports = function (context) {
     }
 
     // Add files which are not part of any build phase (config)
-    files.plist.forEach(function (file) {
+    files.config.forEach(function (file) {
       pbxProject.addFile(file.name, pbxGroupKey);
     });
 
@@ -277,54 +276,23 @@ module.exports = function (context) {
       pbxProject.addResourceFile(file.name, {target: target.uuid}, pbxGroupKey);
     });
 
-    // Add a new PBXFrameworksBuildPhase for the Frameworks used by the Share Extension
-    // (NotificationCenter.framework, libCordova.a)
-    // var frameworksBuildPhase = pbxProject.addBuildPhase(
-    //   [],
-    //   'PBXFrameworksBuildPhase',
-    //   'Frameworks',
-    //   target.uuid
-    // );
-    // if (frameworksBuildPhase) {
-    //   log('Successfully added PBXFrameworksBuildPhase!', 'info');
-    // }
-
-    // Add the frameworks needed by our shareExtension, add them to the existing Frameworks PbxGroup and PBXFrameworksBuildPhase
-    // var frameworkFile1 = pbxProject.addFramework(
-    //   'NotificationCenter.framework',
-    //   { target: target.uuid }
-    // );
-    // var frameworkFile2 = pbxProject.addFramework('libCordova.a', {
-    //   target: target.uuid,
-    // }); // seems to work because the first target is built before the second one
-    // if (frameworkFile1 && frameworkFile2) {
-    //   log('Successfully added frameworks needed by the share extension!', 'info');
-    // }
-
     // Add build settings for Swift support, bridging header and xcconfig files
-    // var configurations = pbxProject.pbxXCBuildConfigurationSection();
-    // for (var key in configurations) {
-    //   if (typeof configurations[key].buildSettings !== 'undefined') {
-    //     var buildSettingsObj = configurations[key].buildSettings;
-    //     if (typeof buildSettingsObj['PRODUCT_NAME'] !== 'undefined') {
-    //       var productName = buildSettingsObj['PRODUCT_NAME'];
-    //       if (productName.indexOf('ShareExtension') >= 0) {
-    //         if (addXcconfig) {
-    //           configurations[key].baseConfigurationReference =
-    //             xcconfigReference + ' /* ' + xcconfigFileName + ' */';
-    //           log('Added xcconfig file reference to build settings!', 'info');
-    //         }
-    //         if (addEntitlementsFile) {
-    //           buildSettingsObj['CODE_SIGN_ENTITLEMENTS'] = '"' + 'ShareExtension' + '/' + entitlementsFileName + '"';
-    //           log('Added entitlements file reference to build settings!', 'info');
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
+    var configurations = pbxProject.pbxXCBuildConfigurationSection();
+    for (var key in configurations) {
+      if (typeof configurations[key].buildSettings !== 'undefined') {
+        var buildSettingsObj = configurations[key].buildSettings;
+        if (typeof buildSettingsObj['PRODUCT_NAME'] !== 'undefined') {
+          var productName = buildSettingsObj['PRODUCT_NAME'];
+          if (productName.indexOf('ShareExt') >= 0) {
+            buildSettingsObj['CODE_SIGN_ENTITLEMENTS'] = '"ShareExtension/ShareExtension.entitlements"';
+            buildSettingsObj['PROVISIONING_PROFILE'] = getCordovaParameter(configXml, 'PROVISIONING_PROFILE');
+            buildSettingsObj['DEVELOPMENT_TEAM'] = getCordovaParameter(configXml, 'DEVELOPMENT_TEAM');
+          }
+        }
+      }
+    }
 
     // Write the modified project back to disc
-    // console.log('    Writing the modified project back to disk...');
     fs.writeFileSync(pbxProjectPath, pbxProject.writeSync());
     console.log('Added ShareExtension to XCode project');
 

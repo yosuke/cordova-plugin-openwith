@@ -33,7 +33,7 @@ A share extension can be used to share any type of content. You have to define w
 
 As with all extensions, the flow of events is expected to be handled by a small app, external to your Cordova App but bundled with it. When installing the plugin, we will add a new target called **ShareExtension** to your XCode project which implements this Extension App. The Extension and the Cordova App live in different processes and can only communicate with each other using inter-app communication methods.
 
-When a user posts some content using the Share Extension, the content will be stored in a Shared User-Preferences Container. To enable this, the Cordova App and Share Extension should define a group and add both the app and extension to it, manually. At the moment, it seems like it's not possible to automate the process. You can read more about this [here](http://www.atomicbird.com/blog/sharing-with-app-extensions).
+When a user posts some content using the Share Extension, the content will be stored in a Shared User-Preferences Container. To enable this, the Cordova App and Share Extension should define a group and add both the app and extension to it.
 
 Once the data is in place in the Shared User-Preferences Container, the Share Extension will open the Cordova App by calling a [Custom URL Scheme](https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/Inter-AppCommunication/Inter-AppCommunication.html#//apple_ref/doc/uid/TP40007072-CH6-SW1). This seems a little borderline as Apple tries hard to prevent this from being possible, but brave iOS developers always find [solutions](https://stackoverflow.com/questions/24297273/openurl-not-work-in-action-extension/24614589#24614589)... So as for now there is one and it seems like people got their app pass the review process with it. At the moment of writing, this method is still working on iOS 11.1. The recommended solution is be to implement the posting logic in the Share Extension, but this doesn't play well with Cordova Apps architecture...
 
@@ -52,25 +52,10 @@ cordova plugin add cordova-plugin-openwith-ios \
 |---|---|---|
 | `IOS_URL_SCHEME` | uniquelonglowercase | Any random long string of lowercase alphabetical characters |
 | `DISPLAY_NAME` | My App Name | If you want to use a different name than your project name |
+| `PROVISIONING_PROFILE` | a71204b0-8187-4dcb-a343-1d43bd543c76 | The provisioning profile ID of your share extension App ID |
+| `DEVELOPMENT_TEAM` | ABCDEFGHIJ | Your Apple team ID |
 
 It shouldn't be too hard. But just in case, Jean-Christophe Hoelt [posted a screencast of it](https://youtu.be/eaE4m_xO1mg).
-
-### iOS Setup
-
-After having installed the plugin, with the ios platform in place, 1 operation needs to be done manually: setup the App Group on both the Cordova App and the Share Extension.
-
- 1. open the **xcodeproject** for your application
- 1. select the root element of your **project navigator** (the left-side pane)
- 1. select the **target** of your application
- 1. select **capabilities**
- 1. scroll down to **App Groups**
- 1. make sure it's **ON**
- 1. create and activate an **App Group** called: `group.<YOUR_APP_BUNDLE_ID>.shareextension`
- 1. repeat the previous five steps for the **ShareExtension target**.
-
-You might also have to select a Team for both the App and Share Extension targets, make sure to select the same.
-
-Build, XCode might complain about a few things to setup that it will fix for you (creation entitlements files, etc).
 
 ## Usage
 
