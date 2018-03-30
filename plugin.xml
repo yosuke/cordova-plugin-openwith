@@ -23,81 +23,78 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -->
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    id="cordova-plugin-openwith"
-    version="1.0.0">
+<plugin
+  xmlns="http://apache.org/cordova/ns/plugins/1.0"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  id="cordova-plugin-openwith"
+  version="1.0.0"
+>
+  <name>OpenWith</name>
+  <description>Cordova "Open With" plugin for Cordova</description>
+  <engines>
+    <engine name="cordova" version=">=6.0.0" />
+  </engines>
+  <repo>https://github.com/missive/cordova-plugin-openwith.git</repo>
+  <issue>https://github.com/missive/cordova-plugin-openwith/issues</issue>
+  <license>MIT</license>
+  <keywords>cordova,phonegap,openwith,ios,android</keywords>
 
-    <name>OpenWith</name>
-	<description>Cordova "Open With" plugin for iOS</description>
-    <engines>
-        <engine name="cordova" version=">=6.0.0" />
-    </engines>
-    <repo>https://github.com/missive/cordova-plugin-openwith.git</repo>
-    <issue>https://github.com/missive/cordova-plugin-openwith/issues</issue>
+  <!-- ios -->
+  <platform name="ios">
+    <preference name="IOS_URL_SCHEME" />
 
-	<license>MIT</license>
-    <keywords>cordova,phonegap,openwith,ios</keywords>
+    <js-module src="www/openwith.js" name="openwith">
+      <clobbers target="cordova.openwith" />
+    </js-module>
 
-    <!-- ios -->
-    <platform name="ios">
-        <preference name="IOS_URL_SCHEME" />
+    <!-- Cordova 2.2 -->
+    <plugins-plist key="OpenWith" string="OpenWith" />
 
-        <js-module src="www/openwith.js" name="openwith">
-            <clobbers target="cordova.openwith" />
-        </js-module>
+    <!-- Cordova 2.5+ -->
+    <config-file target="config.xml" parent="/*">
+      <feature name="OpenWithPlugin">
+        <param name="ios-package" value="OpenWithPlugin" />
+        <param name="onload" value="true" />
+      </feature>
+    </config-file>
 
-        <!-- Cordova 2.2 -->
-        <plugins-plist key="OpenWith" string="OpenWith" />
+    <source-file src="src/ios/OpenWithPlugin.m" />
 
-        <!-- Cordova 2.5+ -->
-        <config-file target="config.xml" parent="/*">
-            <feature name="OpenWithPlugin">
-                <param name="ios-package" value="OpenWithPlugin" />
-                <param name="onload" value="true" />
-            </feature>
-        </config-file>
-
-        <source-file src="src/ios/OpenWithPlugin.m" />
-
-        <!-- Info.plist -->
-        <config-file target="*-Info.plist" parent="CFBundleURLTypes">
-            <array>
-                <dict>
-                    <string>CFBundleURLName</string>
-                    <string>$(CFBundleIdentifier).shareextension</string>
-                    <string>CFBundleURLSchemes</string>
-                    <array>
-                        <string>$IOS_URL_SCHEME</string>
-                    </array>
-                </dict>
-            </array>
-        </config-file>
-
-        <!-- Entitlements (Debug) -->
-        <config-file target="*-Debug.plist" parent="com.apple.security.application-groups">
+    <!-- Info.plist -->
+    <config-file target="*-Info.plist" parent="CFBundleURLTypes">
+      <array>
+        <dict>
+          <string>CFBundleURLName</string>
+          <string>$(CFBundleIdentifier).shareextension</string>
+          <string>CFBundleURLSchemes</string>
           <array>
-            <string>group.$(CFBundleIdentifier).shareextension</string>
+            <string>$IOS_URL_SCHEME</string>
           </array>
-        </config-file>
+        </dict>
+      </array>
+    </config-file>
 
-        <!-- Entitlements (Release) -->
-        <config-file target="*-Release.plist" parent="com.apple.security.application-groups">
-          <array>
-            <string>group.$(CFBundleIdentifier).shareextension</string>
-          </array>
-        </config-file>
+    <!-- Entitlements (Debug) -->
+    <config-file target="*-Debug.plist" parent="com.apple.security.application-groups">
+      <array>
+        <string>group.$(CFBundleIdentifier).shareextension</string>
+      </array>
+    </config-file>
 
-        <!-- Cordova hooks -->
-        <hook type="before_plugin_install" src="hooks/npmInstall.js" />
-        <hook type="before_plugin_install" src="hooks/iosCopyShareExtension.js" />
-        <hook type="after_plugin_install" src="hooks/iosAddTarget.js" />
-        <hook type="before_plugin_uninstall" src="hooks/iosRemoveTarget.js" />
+    <!-- Entitlements (Release) -->
+    <config-file target="*-Release.plist" parent="com.apple.security.application-groups">
+      <array>
+        <string>group.$(CFBundleIdentifier).shareextension</string>
+      </array>
+    </config-file>
 
-        <!-- Dependencies -->
-        <framework src="MobileCoreServices.framework" />
-    </platform>
-<!--
-vim: ts=4:sw=4:et
--->
+    <!-- Cordova hooks -->
+    <hook type="before_plugin_install" src="hooks/npmInstall.js" />
+    <hook type="before_plugin_install" src="hooks/iosCopyShareExtension.js" />
+    <hook type="after_plugin_install" src="hooks/iosAddTarget.js" />
+    <hook type="before_plugin_uninstall" src="hooks/iosRemoveTarget.js" />
+
+    <!-- Dependencies -->
+    <framework src="MobileCoreServices.framework" />
+  </platform>
 </plugin>
