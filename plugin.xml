@@ -100,7 +100,7 @@ SOFTWARE.
 
   <!-- android -->
   <platform name="android">
-    <preference name="ANDROID_MIME_TYPE" />
+    <preference name="ANDROID_MIME_TYPES" />
 
     <js-module src="www/openwith.js" name="openwith">
       <clobbers target="cordova.openwith" />
@@ -109,7 +109,7 @@ SOFTWARE.
     <config-file target="AndroidManifest.xml" parent="/manifest/application/activity">
       <intent-filter>
         <!-- See https://developer.android.com/guide/topics/manifest/data-element.html -->
-        <data android:mimeType="$ANDROID_MIME_TYPE" />
+        $ANDROID_MIME_TYPES
         <action android:name="android.intent.action.SEND" />
         <action android:name="android.intent.action.SEND_MULTIPLE" />
         <category android:name="android.intent.category.DEFAULT" />
