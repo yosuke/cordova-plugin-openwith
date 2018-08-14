@@ -221,12 +221,12 @@ module.exports = function (context) {
     var pbxProject = parsePbxProject(context, pbxProjectPath);
 
     var files = getShareExtensionFiles(context);
-    // printShareExtensionFiles(files);
+    printShareExtensionFiles(files);
 
     var preferences = getPreferences(context, configXml, projectName);
     files.config.concat(files.source).forEach(function(file) {
       replacePreferencesInFile(file.path, preferences);
-      // console.log('    Successfully updated ' + file.name);
+      console.log('    Successfully updated ' + file.name);
     });
 
     // Find if the project already contains the target and group
