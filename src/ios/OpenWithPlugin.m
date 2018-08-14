@@ -1,5 +1,5 @@
 #import <Cordova/CDV.h>
-#import "ShareExtension/ShareViewController.h"
+#import "ShareViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 
 /*
