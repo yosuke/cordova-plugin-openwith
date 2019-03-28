@@ -179,7 +179,7 @@ function getPreferences(context, configXml, projectName) {
 // Return the list of files in the share extension project, organized by type
 function getShareExtensionFiles(context) {
   var files = {source:[],plist:[],resource:[]};
-  var FILE_TYPES = { '.h':'source', '.m':'source', '.plist':'plist' };
+  var FILE_TYPES = { '.h':'source', '.m':'source', '.plist':'plist', '.entitlements':'plist' };
   forEachShareExtensionFile(context, function(file) {
     var fileType = FILE_TYPES[file.extension] || 'resource';
     files[fileType].push(file);
