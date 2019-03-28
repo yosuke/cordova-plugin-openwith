@@ -297,6 +297,10 @@ module.exports = function (context) {
           var buildSettingsObj = configurations[key].buildSettings;
           if (typeof buildSettingsObj['PRODUCT_NAME'] !== 'undefined') {
             var productName = buildSettingsObj['PRODUCT_NAME'];
+            if (productName == projectName) {
+              buildSettingsObj['CODE_SIGN_ENTITLEMENTS'] = '"$(PROJECT_NAME)/Entitlements-$(CONFIGURATION).plist"';
+              console.log('Added signing identities for product!');
+            }
             if (productName.indexOf('ShareExt') >= 0) {
               buildSettingsObj['PRODUCT_BUNDLE_IDENTIFIER'] = bundleid + BUNDLE_SUFFIX;
               buildSettingsObj['CODE_SIGN_ENTITLEMENTS'] = '"ShareExtension/ShareExtension.entitlements"';
