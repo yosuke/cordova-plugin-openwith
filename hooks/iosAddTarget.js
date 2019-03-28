@@ -106,11 +106,11 @@ function getCordovaParameter(configXml, variableName) {
 }
 
 // Get the bundle id from config.xml
-// function getBundleId(context, configXml) {
-//   var elementTree = context.requireCordovaModule('elementtree');
-//   var etree = elementTree.parse(configXml);
-//   return etree.getroot().get('id');
-// }
+function getBundleId(context, configXml) {
+  var elementTree = context.requireCordovaModule('elementtree');
+  var etree = elementTree.parse(configXml);
+  return etree.getroot().get('id');
+}
 
 function parsePbxProject(context, pbxProjectPath) {
   var xcode = context.requireCordovaModule('xcode');
@@ -151,7 +151,8 @@ function projectPlistJson(context, projectName) {
 
 function getPreferences(context, configXml, projectName) {
   var plist = projectPlistJson(context, projectName);
-  var group = "group." + plist.CFBundleIdentifier + BUNDLE_SUFFIX;
+  var bundleid = getBundleId(context, configXml);
+  var group = "group." + bundleid + BUNDLE_SUFFIX;
   if (getCordovaParameter(configXml, 'GROUP_IDENTIFIER') !== "") {
     group = getCordovaParameter(configXml, 'IOS_GROUP_IDENTIFIER');
   }
@@ -160,10 +161,10 @@ function getPreferences(context, configXml, projectName) {
     value: projectName
   }, {
     key: '__BUNDLE_IDENTIFIER__',
-    value: plist.CFBundleIdentifier + BUNDLE_SUFFIX
+    value: bundleid + BUNDLE_SUFFIX
   } ,{
-      key: '__GROUP_IDENTIFIER__',
-      value: group
+    key: '__GROUP_IDENTIFIER__',
+    value: group
   }, {
     key: '__BUNDLE_SHORT_VERSION_STRING__',
     value: plist.CFBundleShortVersionString
@@ -220,6 +221,7 @@ module.exports = function (context) {
   if (configXml) {
     configXml = configXml.substring(configXml.indexOf('<'));
   }
+  var bundleid = getBundleId(context, configXml);
 
   findXCodeproject(context, function(projectFolder, projectName) {
 
@@ -296,6 +298,7 @@ module.exports = function (context) {
           if (typeof buildSettingsObj['PRODUCT_NAME'] !== 'undefined') {
             var productName = buildSettingsObj['PRODUCT_NAME'];
             if (productName.indexOf('ShareExt') >= 0) {
+              buildSettingsObj['PRODUCT_BUNDLE_IDENTIFIER'] = bundleid + BUNDLE_SUFFIX;
               buildSettingsObj['CODE_SIGN_ENTITLEMENTS'] = '"ShareExtension/ShareExtension.entitlements"';
               buildSettingsObj['CODE_SIGN_IDENTITY'] = '"iPhone Distribution"';
               buildSettingsObj['INFOPLIST_FILE'] = '"ShareExtension/ShareExtension-Info.plist"';
