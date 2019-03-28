@@ -297,6 +297,8 @@ module.exports = function (context) {
             var productName = buildSettingsObj['PRODUCT_NAME'];
             if (productName.indexOf('ShareExt') >= 0) {
               buildSettingsObj['CODE_SIGN_ENTITLEMENTS'] = '"ShareExtension/ShareExtension.entitlements"';
+              buildSettingsObj['CODE_SIGN_IDENTITY'] = '"iPhone Distribution"';
+              buildSettingsObj['INFOPLIST_FILE'] = '"ShareExtension/ShareExtension-Info.plist"';
               buildSettingsObj['PROVISIONING_PROFILE'] = PROVISIONING_PROFILE;
               buildSettingsObj['DEVELOPMENT_TEAM'] = DEVELOPMENT_TEAM;
               console.log('Added signing identities for extension!');
