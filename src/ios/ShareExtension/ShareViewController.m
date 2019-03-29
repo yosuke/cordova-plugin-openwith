@@ -102,6 +102,7 @@
 @synthesize verbosityLevel = _verbosityLevel;
 @synthesize userDefaults = _userDefaults;
 @synthesize backURL = _backURL;
+CGFloat m_oldAlpha = 1.0;
 
 - (void) log:(int)level message:(NSString*)message {
     if (level >= self.verbosityLevel) {
@@ -150,12 +151,9 @@
         }
     }
 }
-- (void) viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    [self.view endEditing:YES];
-}
 
-- (void) viewDidLoad {
+- (NSArray*) configurationItems {
+    // To add configuration options via table cells at the bottom of the sheet, return an array of SLComposeSheetConfigurationItem here.
     [self setup];
     [self debug:@"[viewDidLoad]"];
 
@@ -250,6 +248,8 @@
             [self.extensionContext completeRequestReturningItems:@[] completionHandler:nil];
         }
     }
+
+    return @[];
 }
 
 - (void) sendResults: (NSDictionary*)results {
@@ -262,17 +262,13 @@
     [self openURL:[NSURL URLWithString:url]];
 
     // Shut down the extension
-    [self.extensionContext completeRequestReturningItems:@[] completionHandler:nil];
+    [super didSelectPost];
+    //[self.extensionContext completeRequestReturningItems:@[] completionHandler:nil];
 }
 
  - (void) didSelectPost {
      [self debug:@"[didSelectPost]"];
  }
-
-- (NSArray*) configurationItems {
-    // To add configuration options via table cells at the bottom of the sheet, return an array of SLComposeSheetConfigurationItem here.
-    return @[];
-}
 
 - (NSString*) backURLFromBundleID: (NSString*)bundleId {
     if (bundleId == nil) return nil;
@@ -326,8 +322,32 @@
 - (void) willMoveToParentViewController: (UIViewController*)parent {
     NSString *hostBundleID = [parent valueForKey:(@"_hostBundleID")];
     self.backURL = [self backURLFromBundleID:hostBundleID];
+
+    // This is called at the point where the Post dialog is about to be shown.
+    // Make it transparent, so we don't see it, but first remember how transparent it was originally:
+    m_oldAlpha = [ self.view alpha ];
+    [ self.view setAlpha: 0.0 ];
 }
 
+// The code here is from https://stackoverflow.com/questions/32228182/code-to-share-file-path-file-between-a-share-extension-and-ios-app
+- (void) didMoveToParentViewController: (UIViewController*)parent {
+    // Restore the original transparency:
+    [ self.view setAlpha: m_oldAlpha ];
+}
+
+- (id) init {
+    if ( self = [ super init ] ) {
+        // Subscribe to the notification which will tell us when the keyboard is about to pop up:
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector( keyboardWillShow: ) name: UIKeyboardWillShowNotification object: nil];
+    }
+
+    return self;
+}
+
+- (void) keyboardWillShow: (NSNotification*)note {
+    // Dismiss the keyboard before it has had a chance to show up:
+    [ self.view endEditing: true ];
+}
 
 - (NSString *)mimeTypeFromUti: (NSString*)uti {
     if (uti == nil) {
