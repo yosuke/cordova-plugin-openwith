@@ -125,47 +125,28 @@ CGFloat m_oldAlpha = 1.0;
 }
 
 /*
- openURL with iOS 13 fix
- See: https://github.com/JaimeFerBec/cordova-plugin-openwith/commit/b3a2507c5ad8e2980ad0c2a94de6cd1f3ea33fed
+ iOS 13 fix
+ See: https://github.com/j3k0/cordova-plugin-openwith/issues/67#issuecomment-528485958
 */
 - (void) openURL:(nonnull NSURL *)url {
-  SEL selector = NSSelectorFromString(@"openURL:options:completionHandler:");
 
-  UIResponder* responder = self;
-  while ((responder = [responder nextResponder]) != nil) {
-    NSLog(@"responder = %@", responder);
-    if([responder respondsToSelector:selector] == true) {
-      NSMethodSignature *methodSignature = [responder methodSignatureForSelector:selector];
-      NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+    SEL selector = NSSelectorFromString(@"openURL:");
 
-      // Arguments
-      void (^completion)(BOOL success) = ^void(BOOL success) {
-        NSLog(@"Completions block: %i", success);
-      };
-      if (@available(iOS 13.0, *)) {
-        UISceneOpenExternalURLOptions * options = [[UISceneOpenExternalURLOptions alloc] init];
-        options.universalLinksOnly = false;
-        
-        [invocation setTarget: responder];
-        [invocation setSelector: selector];
-        [invocation setArgument: &url atIndex: 2];
-        [invocation setArgument: &options atIndex:3];
-        [invocation setArgument: &completion atIndex: 4];
-        [invocation invoke];
-        break;
-      } else {
-        NSDictionary<NSString *, id> *options = [NSDictionary dictionary];
-        
-        [invocation setTarget: responder];
-        [invocation setSelector: selector];
-        [invocation setArgument: &url atIndex: 2];
-        [invocation setArgument: &options atIndex:3];
-        [invocation setArgument: &completion atIndex: 4];
-        [invocation invoke];
-        break;
-      }
+    UIResponder* responder = self;
+    while ((responder = [responder nextResponder]) != nil) {
+        NSLog(@"responder = %@", responder);
+        if([responder respondsToSelector:selector] == true) {
+            NSMethodSignature *methodSignature = [responder methodSignatureForSelector:selector];
+            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+
+            [invocation setTarget: responder];
+            [invocation setSelector: selector];
+            [invocation setArgument: &url atIndex: 2];
+
+            [invocation invoke];
+            break;
+        }
     }
-  }
 }
 
 - (NSArray*) configurationItems {
